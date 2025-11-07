@@ -1,3 +1,4 @@
+from sys import float_repr_style
 import pygame
 
 WIDTH, HEIGHT = 640, 640
@@ -17,6 +18,7 @@ class Board():
         self.height = height
         self.piecesArray = []
         self.selected_piece = None
+        self.turn = WHITE_PIECE_COLOR
         self.initial_board()
 
     def initial_board(self):
@@ -58,7 +60,8 @@ class Board():
 
         # # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
-            if clicked_piece is not None:
+            # if clicked_piece is not none and the clicked_piece is the same as the current turn
+            if clicked_piece is not None and clicked_piece.color == self.turn:
                 self.selected_piece = clicked_piece
                 return
         else:
@@ -66,9 +69,15 @@ class Board():
                 self.selected_piece = clicked_piece
                 return
             if clicked_piece is None:
-                self.move_piece(self.selected_piece, row, col)
-                self.selected_piece = None
-                return
+
+                isMoved = self.move_piece(self.selected_piece, row, col)
+                if isMoved:
+                    self.selected_piece = None
+                    if self.turn == WHITE_PIECE_COLOR:
+                        self.turn = BLACK_PIECE_COLOR
+                    else:
+                        self.turn = WHITE_PIECE_COLOR
+                    return
 
 
     # method to move pieces
@@ -76,27 +85,31 @@ class Board():
         # move to another filled cell
         if (self.piecesArray[new_row][new_col]) is not None:
             print("Can't move. target already occupied.")
-            return
+            return False
 
         # get old row and col
         prevRow = piece.row
         prevCol = piece.col
 
         #move rules
-        if (prevRow == new_row or prevCol == new_col): return
+        if (prevRow == new_row or prevCol == new_col): return False
+        rowDiff = new_row - prevRow
+        colDiff = new_col - prevCol
 
-        if abs(new_row - prevRow) > 1 or abs(new_col - prevCol) > 1: return
+        if abs(rowDiff) > 1 or abs(colDiff) > 1: return False
 
         if piece.color == WHITE_PIECE_COLOR:
-            if new_row > prevRow: return
+            if new_row > prevRow: return False
         else:
-            if prevRow > new_row: return
+            if prevRow > new_row: return False
 
 
         self.piecesArray[prevRow][prevCol] = None
         self.piecesArray[new_row][new_col] = piece
         piece.row = new_row
         piece.col = new_col
+
+        return True
 
 
 
@@ -108,7 +121,6 @@ class Pieces():
         self.col = col
         self.window = window
         self.king = False
-        self.turn = ""
 
     def draw_piece(self):
         center_x = self.col * CELL_SIZE + CELL_SIZE // 2
