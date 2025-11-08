@@ -1,12 +1,11 @@
-from sys import float_repr_style
 import pygame
 
 WIDTH, HEIGHT = 640, 640
 ROWS, COLS = 8,8
 CELL_SIZE = WIDTH / COLS
 
-BLACK = (50, 34, 19)
-WHITE = (241, 204, 164)
+BLACK = (42, 45, 56)
+WHITE = (211, 218, 228)
 BLACK_PIECE_COLOR = (67, 71, 74)
 WHITE_PIECE_COLOR = (255,255,255)
 
@@ -84,32 +83,54 @@ class Board():
     def move_piece(self, piece, new_row, new_col):
         # move to another filled cell
         if (self.piecesArray[new_row][new_col]) is not None:
-            print("Can't move. target already occupied.")
             return False
 
-        # get old row and col
+        # get old row and col from the clicked_piece
         prevRow = piece.row
         prevCol = piece.col
 
         #move rules
-        if (prevRow == new_row or prevCol == new_col): return False
+        if (prevRow == new_row or prevCol == new_col):
+            return False
+
         rowDiff = new_row - prevRow
         colDiff = new_col - prevCol
 
-        if abs(rowDiff) > 1 or abs(colDiff) > 1: return False
+        if abs(rowDiff) == 1 and abs(colDiff) == 1:
 
-        if piece.color == WHITE_PIECE_COLOR:
-            if new_row > prevRow: return False
-        else:
-            if prevRow > new_row: return False
+            if piece.color == WHITE_PIECE_COLOR:
+                if new_row > prevRow: return False
+            else:
+                if prevRow > new_row: return False
 
 
-        self.piecesArray[prevRow][prevCol] = None
-        self.piecesArray[new_row][new_col] = piece
-        piece.row = new_row
-        piece.col = new_col
+            self.piecesArray[prevRow][prevCol] = None
+            self.piecesArray[new_row][new_col] = piece
 
-        return True
+            piece.row = new_row
+            piece.col = new_col
+
+            return True
+
+        # check for potential capture
+        if abs(rowDiff) == 2 and abs(colDiff) == 2:
+            mid_row = (prevRow + new_row) // 2
+            mid_col = (prevCol + new_col) // 2
+            enemy_piece = self.piecesArray[mid_row][mid_col]
+
+            if enemy_piece is not None and enemy_piece.color != piece.color:
+                self.piecesArray[mid_row][mid_col] = None
+                self.piecesArray[prevRow][prevCol] = None
+                self.piecesArray[new_row][new_col] = piece
+
+                piece.row = new_row
+                piece.col = new_col
+
+                return True
+
+            return False
+
+        return False
 
 
 
