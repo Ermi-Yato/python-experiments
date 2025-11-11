@@ -162,7 +162,7 @@ class Board():
                 if landing_square is None:
                     captures.append((landing_r, landing_c))
 
-        print(captures)
+        return captures
 
 
 # PIECES CLASS
