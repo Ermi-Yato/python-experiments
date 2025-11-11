@@ -67,6 +67,7 @@ class Board():
             if clicked_piece is not None and clicked_piece.color == self.selected_piece.color:
                 self.selected_piece = clicked_piece
                 return
+
             if clicked_piece is None:
 
                 isMoved = self.move_piece(self.selected_piece, row, col)
@@ -86,7 +87,7 @@ class Board():
 
         # Prevent moving into occupied place
         if (self.piecesArray[new_row][new_col]) is not None:
-            return False
+            return None
 
 
         rowDiff = new_row - prevRow
@@ -97,9 +98,9 @@ class Board():
 
             # For normal pieces, only forward move is possible
             if piece.color == WHITE_PIECE_COLOR:
-                if new_row > prevRow: return False
+                if new_row > prevRow: return None
             else:
-                if prevRow > new_row: return False
+                if prevRow > new_row: return None
 
 
             self.piecesArray[prevRow][prevCol] = None
@@ -108,7 +109,7 @@ class Board():
             piece.row = new_row
             piece.col = new_col
 
-            return True
+            return "normal"
 
         # CAPTURE ATTEMPT
         
@@ -128,12 +129,12 @@ class Board():
                 piece.row = new_row
                 piece.col = new_col
 
-                return True
+                return "capture"
 
-            return False
+            return None
 
         # Everything else fails
-        return False
+        return None
 
     # returns a coordinate of a capture
     def get_capture_moves(self, piece):
