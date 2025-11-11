@@ -79,25 +79,23 @@ class Board():
                     return
 
 
-    # method to move pieces
+    # move and capture logic with proper logic
     def move_piece(self, piece, new_row, new_col):
-        # move to another filled cell
-        if (self.piecesArray[new_row][new_col]) is not None:
-            return False
-
-        # get old row and col from the clicked_piece
         prevRow = piece.row
         prevCol = piece.col
 
-        #move rules
-        if (prevRow == new_row or prevCol == new_col):
+        # Prevent moving into occupied place
+        if (self.piecesArray[new_row][new_col]) is not None:
             return False
+
 
         rowDiff = new_row - prevRow
         colDiff = new_col - prevCol
 
+        # REGULAR MOVE 
         if abs(rowDiff) == 1 and abs(colDiff) == 1:
 
+            # For normal pieces, only forward move is possible
             if piece.color == WHITE_PIECE_COLOR:
                 if new_row > prevRow: return False
             else:
@@ -112,12 +110,16 @@ class Board():
 
             return True
 
-        # check for potential capture
+        # CAPTURE ATTEMPT
+        
         if abs(rowDiff) == 2 and abs(colDiff) == 2:
+
+            # Get the enemy_piece or middle one
             mid_row = (prevRow + new_row) // 2
             mid_col = (prevCol + new_col) // 2
             enemy_piece = self.piecesArray[mid_row][mid_col]
 
+            # If middle piece is enemy_piece
             if enemy_piece is not None and enemy_piece.color != piece.color:
                 self.piecesArray[mid_row][mid_col] = None
                 self.piecesArray[prevRow][prevCol] = None
@@ -130,8 +132,36 @@ class Board():
 
             return False
 
+        # Everything else fails
         return False
 
+    # returns a coordinate of a capture
+    def get_capture_moves(self, piece):
+        row, col = piece.row, piece.col
+        captures = []
+
+        moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
+
+        for rowDir, colDir in moveDirection:
+            mid_r = row + rowDir
+            mid_c = col + colDir
+            landing_r = row + rowDir*2
+            landing_c = col + colDir*2
+
+            # check for bounds
+            if not(0 <= mid_r < ROWS and 0 <= mid_c < COLS):
+                continue
+            if not(0 <= landing_r < ROWS and 0 <= landing_c < COLS):
+                continue
+
+            middle_piece = self.piecesArray[mid_r][mid_c]
+            landing_square = self.piecesArray[landing_r][landing_c]
+
+            if middle_piece is not None and middle_piece.color != piece.color:
+                if landing_square is None:
+                    captures.append((landing_r, landing_c))
+
+        print(captures)
 
 
 # PIECES CLASS
