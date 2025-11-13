@@ -56,6 +56,9 @@ class Board():
     def handle_click(self, mouseX, mouseY):
         row, col = self.onClick(mouseX,mouseY)
         clicked_piece = self.piecesArray[row][col]
+        if clicked_piece:
+            captures = self.get_capture_moves(clicked_piece)
+            print(captures, len(captures))
 
         # # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
@@ -140,6 +143,7 @@ class Board():
     def get_capture_moves(self, piece):
         row, col = piece.row, piece.col
         captures = []
+        results = []
 
         moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
 
@@ -160,9 +164,21 @@ class Board():
 
             if middle_piece is not None and middle_piece.color != piece.color:
                 if landing_square is None:
-                    captures.append((landing_r, landing_c))
+                    # simulate capturing
+                    removed = self.piecesArray[mid_r][mid_c]
+                    self.piecesArray[landing_r][landing_c] = piece
+                    piece.row, piece.col = landing_r, landing_c
 
-        return captures
+                    nextcaptures = self.get_capture_moves(piece)
+                    captures.append([(landing_r, landing_c)] + nextcaptures)
+                    results.append(captures)
+
+                    # restore 
+                    self.piecesArray[mid_r][mid_c] = removed
+                    self.piecesArray[landing_r][landing_c] = None
+                    piece.row, piece.col = row, col
+
+        return results
 
 
 # PIECES CLASS
