@@ -56,11 +56,8 @@ class Board():
     def handle_click(self, mouseX, mouseY):
         row, col = self.onClick(mouseX,mouseY)
         clicked_piece = self.piecesArray[row][col]
-        if clicked_piece:
-            captures = self.get_capture_moves(clicked_piece)
-            print(captures, len(captures))
 
-        # # if no piece is selected and the clicked cell contains a piece
+        # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
             # if clicked_piece is not none and the clicked_piece is the same as the current turn
             if clicked_piece is not None and clicked_piece.color == self.turn:
@@ -74,13 +71,23 @@ class Board():
             if clicked_piece is None:
 
                 isMoved = self.move_piece(self.selected_piece, row, col)
-                if isMoved:
+                if isMoved == "normal":
                     self.selected_piece = None
                     if self.turn == WHITE_PIECE_COLOR:
                         self.turn = BLACK_PIECE_COLOR
                     else:
                         self.turn = WHITE_PIECE_COLOR
                     return
+                if isMoved == "capture":
+                    capturePositions = self.get_capture_moves(self.selected_piece)
+                    if capturePositions:
+                        for path in capturePositions:
+                            for i in path:
+                                print("possible path position: ", i)
+                        
+                    else:
+                        self.selected_piece = None
+                        self.turn = (BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR)
 
 
     # move and capture logic with proper logic
@@ -142,7 +149,6 @@ class Board():
     # returns a coordinate of a capture
     def get_capture_moves(self, piece):
         row, col = piece.row, piece.col
-        captures = []
         results = []
 
         moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
@@ -170,8 +176,13 @@ class Board():
                     piece.row, piece.col = landing_r, landing_c
 
                     nextcaptures = self.get_capture_moves(piece)
-                    captures.append([(landing_r, landing_c)] + nextcaptures)
-                    results.append(captures)
+                    capturePos = [landing_r, landing_c]
+                    
+                    if not nextcaptures:
+                        results.append([capturePos])
+                    else:
+                        for path in nextcaptures:
+                            results.append([capturePos] + path)
 
                     # restore 
                     self.piecesArray[mid_r][mid_c] = removed
