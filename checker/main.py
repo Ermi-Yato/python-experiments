@@ -17,6 +17,7 @@ class Board():
         self.height = height
         self.piecesArray = []
         self.selected_piece = None
+        self.allowed_captures = []
         self.turn = WHITE_PIECE_COLOR
         self.initial_board()
 
@@ -57,6 +58,12 @@ class Board():
         row, col = self.onClick(mouseX,mouseY)
         clicked_piece = self.piecesArray[row][col]
 
+        # force to capture until the path fully ended
+        if self.allowed_captures:
+            if [row,col] not in self.allowed_captures:
+                print("You must finish capturing first")
+                return
+
         # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
             # if clicked_piece is not none and the clicked_piece is the same as the current turn
@@ -78,16 +85,16 @@ class Board():
                     else:
                         self.turn = WHITE_PIECE_COLOR
                     return
+
                 if isMoved == "capture":
-                    capturePositions = self.get_capture_moves(self.selected_piece)
-                    if capturePositions:
-                        for path in capturePositions:
-                            for i in path:
-                                print("possible path position: ", i)
-                        
+                    nextCapPos = self.get_capture_moves(self.selected_piece)
+                    if nextCapPos:
+                        self.allowed_captures = nextCapPos[0]
+                        self.selected_piece = self.selected_piece
                     else:
                         self.selected_piece = None
-                        self.turn = (BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR)
+                        self.allowed_captures = []
+                        self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
 
 
     # move and capture logic with proper logic
@@ -95,15 +102,14 @@ class Board():
         prevRow = piece.row
         prevCol = piece.col
 
+        rowDiff = new_row - prevRow
+        colDiff = new_col - prevCol
+
         # Prevent moving into occupied place
         if (self.piecesArray[new_row][new_col]) is not None:
             return None
 
-
-        rowDiff = new_row - prevRow
-        colDiff = new_col - prevCol
-
-        # REGULAR MOVE 
+                # REGULAR MOVE 
         if abs(rowDiff) == 1 and abs(colDiff) == 1:
 
             # For normal pieces, only forward move is possible
@@ -111,7 +117,6 @@ class Board():
                 if new_row > prevRow: return None
             else:
                 if prevRow > new_row: return None
-
 
             self.piecesArray[prevRow][prevCol] = None
             self.piecesArray[new_row][new_col] = piece
@@ -146,6 +151,26 @@ class Board():
         # Everything else fails
         return None
 
+
+    def get_all_capture_moves(self, board, color):
+        all_captures = []
+        for row in range(ROWS):
+            for col in range(COLS):
+                piece = board[row][col]
+
+                if piece is None:
+                    continue
+                if piece.color != color:
+                    continue
+
+                captures = self.get_capture_moves(piece)
+                all_captures.append({
+                    "piece": piece,
+                    "moves": captures
+                })
+
+        return all_captures
+
     # returns a coordinate of a capture
     def get_capture_moves(self, piece):
         row, col = piece.row, piece.col
@@ -175,14 +200,15 @@ class Board():
                     self.piecesArray[landing_r][landing_c] = piece
                     piece.row, piece.col = landing_r, landing_c
 
+                    # call the function with update piece coordinates // recursion
                     nextcaptures = self.get_capture_moves(piece)
-                    capturePos = [landing_r, landing_c]
+                    landingPos = [landing_r, landing_c]
                     
                     if not nextcaptures:
-                        results.append([capturePos])
+                        results.append([landingPos])
                     else:
                         for path in nextcaptures:
-                            results.append([capturePos] + path)
+                            results.append([landingPos] + path)
 
                     # restore 
                     self.piecesArray[mid_r][mid_c] = removed
