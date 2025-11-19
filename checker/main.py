@@ -58,6 +58,9 @@ class Board():
         row, col = self.onClick(mouseX,mouseY)
         clicked_piece = self.piecesArray[row][col]
 
+        # get all available captures
+        all_captures = self.get_all_capture_moves(self.piecesArray, self.turn)
+        
         # force to capture until the path fully ended
         if self.allowed_captures:
             if [row,col] not in self.allowed_captures:
@@ -66,34 +69,53 @@ class Board():
 
         # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
-            # if clicked_piece is not none and the clicked_piece is the same as the current turn
+            if len(all_captures) > 0:
+                # we must limit the selection to the piece who can capture
+                for obj in all_captures:
+                    if obj["piece"] == clicked_piece:
+                        self.selected_piece = clicked_piece
+                        return
+                print("You have to capture!")
+                return
+
+            # if clicked_piece is not none and the clicked_piece is the same as the current turn and nothing to capture
             if clicked_piece is not None and clicked_piece.color == self.turn:
                 self.selected_piece = clicked_piece
                 return
+
         else:
+            # selecting another similar piece
             if clicked_piece is not None and clicked_piece.color == self.selected_piece.color:
+                if len(all_captures) > 0:
+                    for obj in all_captures:
+                        if obj["piece"] == clicked_piece:
+                            self.selected_piece = clicked_piece
+                            return
+                    print("You have to capture!")
+                    return
+
                 self.selected_piece = clicked_piece
                 return
 
             if clicked_piece is None:
-
+                # attempt to capture
                 isMoved = self.move_piece(self.selected_piece, row, col)
                 if isMoved == "normal":
                     self.selected_piece = None
-                    if self.turn == WHITE_PIECE_COLOR:
-                        self.turn = BLACK_PIECE_COLOR
-                    else:
-                        self.turn = WHITE_PIECE_COLOR
+                    # switch turn
+                    self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
                     return
 
                 if isMoved == "capture":
                     nextCapPos = self.get_capture_moves(self.selected_piece)
+
                     if nextCapPos:
                         self.allowed_captures = nextCapPos[0]
                         self.selected_piece = self.selected_piece
                     else:
                         self.selected_piece = None
                         self.allowed_captures = []
+                        # switch turn
                         self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
 
 
@@ -164,10 +186,13 @@ class Board():
                     continue
 
                 captures = self.get_capture_moves(piece)
-                all_captures.append({
-                    "piece": piece,
-                    "moves": captures
-                })
+                for capture in captures:
+                    if len(capture) > 0:
+                        all_captures.append({
+                            "piece": piece,
+                            "moves": capture
+                        })
+
 
         return all_captures
 
