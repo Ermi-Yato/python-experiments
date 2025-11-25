@@ -1,0 +1,11 @@
+# =========================
+# GAME SETTINGS GOES HERE
+# =========================
+WIDTH, HEIGHT = 640, 640
+ROWS, COLS = 8,8
+CELL_SIZE = WIDTH / COLS
+BLACK = (42, 45, 56)
+WHITE = (211, 218, 228)
+BLACK_PIECE_COLOR = (67, 71, 74)
+WHITE_PIECE_COLOR = (255,255,255)
+
