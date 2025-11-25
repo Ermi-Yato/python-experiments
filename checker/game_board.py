@@ -38,11 +38,17 @@ class Board():
                 color = WHITE if (row+col)%2 == 0 else BLACK
                 pygame.draw.rect(self.window, color, (col*CELL_SIZE,row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
 
+        if self.selected_piece:
+            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
+            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
+            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
+
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.piecesArray[row][col]
                 if piece is not None:
                     piece.draw_piece()
+
 
     def onClick(self, mouseX,mouseY):
         row = mouseY // CELL_SIZE
@@ -52,20 +58,15 @@ class Board():
     def handle_click(self, mouseX, mouseY):
         row, col = onClick(mouseX, mouseY)
         clicked_piece = self.piecesArray[row][col]
-
-        # get all available captures
         all_captures = self.get_all_capture_moves(self.piecesArray, self.turn)
-        
-        # force to capture until the path fully ended
+
         if self.allowed_captures:
             if [row,col] not in self.allowed_captures:
                 print("You must finish capturing first")
                 return
 
-        # if no piece is selected and the clicked cell contains a piece
         if self.selected_piece is None:
             if len(all_captures) > 0:
-                # we must limit the selection to the piece who can capture
                 for obj in all_captures:
                     if obj["piece"] == clicked_piece:
                         self.selected_piece = clicked_piece
@@ -73,13 +74,11 @@ class Board():
                 print("You have to capture!")
                 return
 
-            # if clicked_piece is not none and the clicked_piece is the same as the current turn and nothing to capture
             if clicked_piece is not None and clicked_piece.color == self.turn:
                 self.selected_piece = clicked_piece
                 return
 
         else:
-            # selecting another similar piece
             if clicked_piece is not None and clicked_piece.color == self.selected_piece.color:
                 if len(all_captures) > 0:
                     for obj in all_captures:
@@ -93,11 +92,9 @@ class Board():
                 return
 
             if clicked_piece is None:
-                # attempt to capture
                 isMoved = self.move_piece(self.selected_piece, row, col)
                 if isMoved == "normal":
                     self.selected_piece = None
-                    # switch turn
                     self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
                     return
 
@@ -110,7 +107,6 @@ class Board():
                     else:
                         self.selected_piece = None
                         self.allowed_captures = []
-                        # switch turn
                         self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
     
 
@@ -123,14 +119,11 @@ class Board():
         rowDiff = new_row - prevRow
         colDiff = new_col - prevCol
 
-        # Prevent moving into occupied place
         if (self.piecesArray[new_row][new_col]) is not None:
             return None
 
-                # REGULAR MOVE 
         if abs(rowDiff) == 1 and abs(colDiff) == 1:
 
-            # For normal pieces, only forward move is possible
             if piece.color == WHITE_PIECE_COLOR:
                 if new_row > prevRow: return None
             else:
@@ -144,16 +137,11 @@ class Board():
 
             return "normal"
 
-        # CAPTURE ATTEMPT
-        
         if abs(rowDiff) == 2 and abs(colDiff) == 2:
-
-            # Get the enemy_piece or middle one
             mid_row = (prevRow + new_row) // 2
             mid_col = (prevCol + new_col) // 2
             enemy_piece = self.piecesArray[mid_row][mid_col]
 
-            # If middle piece is enemy_piece
             if enemy_piece is not None and enemy_piece.color != piece.color:
                 self.piecesArray[mid_row][mid_col] = None
                 self.piecesArray[prevRow][prevCol] = None
@@ -166,7 +154,6 @@ class Board():
 
             return None
 
-        # Everything else fails
         return None
 
     def get_all_capture_moves(self, board, color):
