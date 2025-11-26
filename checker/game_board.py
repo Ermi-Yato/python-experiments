@@ -3,7 +3,7 @@ import pygame
 from settings import ROWS, COLS, CELL_SIZE
 from settings import BLACK, WHITE, BLACK_PIECE_COLOR, WHITE_PIECE_COLOR
 from pieces import Pieces
-from game_functions import onClick
+from game_functions import onClick, move_piece, get_all_capture_moves, get_capture_moves
 
 class Board():
     def __init__(self, window, width, height):
@@ -38,10 +38,6 @@ class Board():
                 color = WHITE if (row+col)%2 == 0 else BLACK
                 pygame.draw.rect(self.window, color, (col*CELL_SIZE,row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
 
-        if self.selected_piece:
-            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
-            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
-            pygame.draw.rect(self.window, "red", (self.selected_piece.col*CELL_SIZE,self.selected_piece.row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
 
         for row in range(ROWS):
             for col in range(COLS):
@@ -58,7 +54,7 @@ class Board():
     def handle_click(self, mouseX, mouseY):
         row, col = onClick(mouseX, mouseY)
         clicked_piece = self.piecesArray[row][col]
-        all_captures = self.get_all_capture_moves(self.piecesArray, self.turn)
+        all_captures = get_all_capture_moves(self.piecesArray, self.turn)
 
         if self.allowed_captures:
             if [row,col] not in self.allowed_captures:
@@ -92,14 +88,14 @@ class Board():
                 return
 
             if clicked_piece is None:
-                isMoved = self.move_piece(self.selected_piece, row, col)
+                isMoved = move_piece(self.selected_piece, row, col, self.piecesArray)
                 if isMoved == "normal":
                     self.selected_piece = None
                     self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
                     return
 
                 if isMoved == "capture":
-                    nextCapPos = self.get_capture_moves(self.selected_piece)
+                    nextCapPos = get_capture_moves(self.selected_piece, self.piecesArray)
 
                     if nextCapPos:
                         self.allowed_captures = nextCapPos[0]
@@ -108,122 +104,3 @@ class Board():
                         self.selected_piece = None
                         self.allowed_captures = []
                         self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
-    
-
-
-
-    def move_piece(self, piece, new_row, new_col):
-        prevRow = piece.row
-        prevCol = piece.col
-
-        rowDiff = new_row - prevRow
-        colDiff = new_col - prevCol
-
-        if (self.piecesArray[new_row][new_col]) is not None:
-            return None
-
-        if abs(rowDiff) == 1 and abs(colDiff) == 1:
-
-            if piece.color == WHITE_PIECE_COLOR:
-                if new_row > prevRow: return None
-            else:
-                if prevRow > new_row: return None
-
-            self.piecesArray[prevRow][prevCol] = None
-            self.piecesArray[new_row][new_col] = piece
-
-            piece.row = new_row
-            piece.col = new_col
-
-            return "normal"
-
-        if abs(rowDiff) == 2 and abs(colDiff) == 2:
-            mid_row = (prevRow + new_row) // 2
-            mid_col = (prevCol + new_col) // 2
-            enemy_piece = self.piecesArray[mid_row][mid_col]
-
-            if enemy_piece is not None and enemy_piece.color != piece.color:
-                self.piecesArray[mid_row][mid_col] = None
-                self.piecesArray[prevRow][prevCol] = None
-                self.piecesArray[new_row][new_col] = piece
-
-                piece.row = new_row
-                piece.col = new_col
-
-                return "capture"
-
-            return None
-
-        return None
-
-    def get_all_capture_moves(self, board, color):
-        all_captures = []
-        for row in range(ROWS):
-            for col in range(COLS):
-                piece = board[row][col]
-
-                if piece is None:
-                    continue
-                if piece.color != color:
-                    continue
-
-                captures = self.get_capture_moves(piece)
-                for capture in captures:
-                    if len(capture) > 0:
-                        all_captures.append({
-                            "piece": piece,
-                            "moves": capture
-                        })
-
-
-        return all_captures
-
-    # returns a coordinate of a capture
-    def get_capture_moves(self, piece):
-        row, col = piece.row, piece.col
-        results = []
-
-        moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
-
-        for rowDir, colDir in moveDirection:
-            mid_r = row + rowDir
-            mid_c = col + colDir
-            landing_r = row + rowDir*2
-            landing_c = col + colDir*2
-
-            # check for bounds
-            if not(0 <= mid_r < ROWS and 0 <= mid_c < COLS):
-                continue
-            if not(0 <= landing_r < ROWS and 0 <= landing_c < COLS):
-                continue
-
-            middle_piece = self.piecesArray[mid_r][mid_c]
-            landing_square = self.piecesArray[landing_r][landing_c]
-
-            if middle_piece is not None and middle_piece.color != piece.color:
-                if landing_square is None:
-                    # simulate capturing
-                    removed = self.piecesArray[mid_r][mid_c]
-                    self.piecesArray[landing_r][landing_c] = piece
-                    piece.row, piece.col = landing_r, landing_c
-
-                    # call the function with update piece coordinates // recursion
-                    nextcaptures = self.get_capture_moves(piece)
-                    landingPos = [landing_r, landing_c]
-                    
-                    if not nextcaptures:
-                        results.append([landingPos])
-                    else:
-                        for path in nextcaptures:
-                            results.append([landingPos] + path)
-
-                    # restore 
-                    self.piecesArray[mid_r][mid_c] = removed
-                    self.piecesArray[landing_r][landing_c] = None
-                    piece.row, piece.col = row, col
-
-        return results
-
-
-
-
