@@ -1,4 +1,4 @@
-from settings import CELL_SIZE, COLS, ROWS, WHITE_PIECE_COLOR
+from settings import BLACK_PIECE_COLOR, CELL_SIZE, COLS, ROWS, WHITE_PIECE_COLOR
 
 def onClick(mouseX, mouseY):
     row = mouseY // CELL_SIZE
@@ -58,9 +58,7 @@ def get_all_capture_moves(piecesArray, color):
         for col in range(COLS):
             piece = piecesArray[row][col]
 
-            if piece is None:
-                continue
-            if piece.color != color:
+            if piece is None or piece.color != color:
                 continue
 
             captures = get_capture_moves(piece, piecesArray)
@@ -114,5 +112,67 @@ def get_capture_moves(piece, piecesArray):
 
     return captures
 
-def gameWinner(piecesArray, turnColor):
-    pass
+# WARNING: NEEDS A FIX
+def get_normal_moves(piece, piecesArray):
+    prevRow, prevCol = piece.row, piece.col
+    moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
+
+    for rDir, colD in moveDirection:
+        new_row = prevRow + rDir
+        new_col = prevCol + colD
+
+        if not(0 <= new_row < ROWS and 0 <= new_col < COLS):
+            continue
+        if piecesArray[new_row][new_col] is None:
+            return True
+  
+    return False
+
+def get_legal_moves(piecesArray, color):
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = piecesArray[row][col]
+
+            if piece is None or piece.color != color:
+                continue
+
+            if get_normal_moves(piece, piecesArray):
+                return True
+            if get_capture_moves(piece, piecesArray):
+                return True
+
+    return False
+
+def gameWinner(piecesArray):
+    whitePieces = get_piece_count(piecesArray, WHITE_PIECE_COLOR)
+    blackPieces = get_piece_count(piecesArray, BLACK_PIECE_COLOR)
+
+    # 1st case
+    if whitePieces == 0:
+        return "BLACK"
+    if blackPieces == 0:
+        return "WHITE"
+    
+    if not get_legal_moves(piecesArray, WHITE_PIECE_COLOR):
+        return "BLACK"
+    if not get_legal_moves(piecesArray, BLACK_PIECE_COLOR):
+        return "WHITE"
+
+    return None
+
+# get piece count with turn
+def get_piece_count(piecesArray, turnColor):
+    pieces = []
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = piecesArray[row][col]
+
+            if piece is None:
+                continue
+            if piece.color != turnColor:
+                continue
+
+            pieces.append(piece)
+
+    return len(pieces)
+

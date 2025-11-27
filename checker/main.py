@@ -1,3 +1,4 @@
+from game_functions import gameWinner
 import pygame
 from settings import WIDTH, HEIGHT
 from game_board import Board
@@ -24,6 +25,11 @@ def run_game():
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouseX, mouseY = event.pos
                 board.handle_click(mouseX, mouseY)
+
+        winner = gameWinner(board.piecesArray)
+        if winner:
+            print(f"{winner} wins!")
+            run = False
 
         board.draw_board()
         pygame.display.update()

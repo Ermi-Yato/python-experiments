@@ -38,7 +38,6 @@ class Board():
                 color = WHITE if (row+col)%2 == 0 else BLACK
                 pygame.draw.rect(self.window, color, (col*CELL_SIZE,row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
 
-
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.piecesArray[row][col]
