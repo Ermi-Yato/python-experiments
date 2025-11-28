@@ -1,8 +1,12 @@
-from settings import BLACK_PIECE_COLOR, CELL_SIZE, COLS, ROWS, WHITE_PIECE_COLOR
+from settings import BLACK_PIECE_COLOR, BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE, COLS, HEIGHT, ROWS, WHITE_PIECE_COLOR, WIDTH
 
+# TODO: YOU HAVE TO UNDERSTAND THIS
 def onClick(mouseX, mouseY):
-    row = mouseY // CELL_SIZE
-    col = mouseX // CELL_SIZE
+    startX = (WIDTH - BOARD_WIDTH) / 2
+    startY = (HEIGHT - BOARD_HEIGHT) / 2
+
+    row = (mouseY - startY) // CELL_SIZE
+    col = (mouseX - startX) // CELL_SIZE
     return int(row), int(col)
 
 def move_piece(piece, new_row, new_col, piecesArray):
@@ -14,7 +18,7 @@ def move_piece(piece, new_row, new_col, piecesArray):
     # ATTEMPT TO MOVE ONTO OCCUPIED SQUARE
     if piecesArray[new_row][new_col] is not None:
         return None
-   
+
     # NORMAL MOVE
     if abs(rowDiff) == 1 and abs(colDiff) == 1:
         if piece.color == WHITE_PIECE_COLOR:
@@ -147,12 +151,11 @@ def gameWinner(piecesArray):
     whitePieces = get_piece_count(piecesArray, WHITE_PIECE_COLOR)
     blackPieces = get_piece_count(piecesArray, BLACK_PIECE_COLOR)
 
-    # 1st case
-    if whitePieces == 0:
+    if whitePieces == 10:
         return "BLACK"
-    if blackPieces == 0:
+    if blackPieces == 10:
         return "WHITE"
-    
+
     if not get_legal_moves(piecesArray, WHITE_PIECE_COLOR):
         return "BLACK"
     if not get_legal_moves(piecesArray, BLACK_PIECE_COLOR):

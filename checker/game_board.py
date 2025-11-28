@@ -1,6 +1,6 @@
 # GAME BOARD
 import pygame
-from settings import ROWS, COLS, CELL_SIZE
+from settings import BOARD_HEIGHT, BOARD_WIDTH, HEIGHT, ROWS, COLS, CELL_SIZE, WIDTH
 from settings import BLACK, WHITE, BLACK_PIECE_COLOR, WHITE_PIECE_COLOR
 from pieces import Pieces
 from game_functions import onClick, move_piece, get_all_capture_moves, get_capture_moves
@@ -20,23 +20,23 @@ class Board():
         for row in range(ROWS):
             self.piecesArray.append([])
             for col in range(COLS):
-                if (row+col)%2 != 0:
+                if (row+col) % 2 != 0:
                     if row < 3:
-                        self.piecesArray[row].append(Pieces(BLACK_PIECE_COLOR, row, col, self.window))
+                        self.piecesArray[row].append(Pieces(BLACK_PIECE_COLOR, row, col, self.window, False))
                     elif row > 4:
-                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window))
+                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window, False))
                     else:
                         self.piecesArray[row].append(None)
                 else:
                     self.piecesArray[row].append(None)
 
-
-
     def draw_board(self):
+        startX = (WIDTH - BOARD_WIDTH) / 2
+        startY = (HEIGHT - BOARD_HEIGHT) / 2
         for row in range(ROWS):
             for col in range(COLS):
                 color = WHITE if (row+col)%2 == 0 else BLACK
-                pygame.draw.rect(self.window, color, (col*CELL_SIZE,row*CELL_SIZE,CELL_SIZE,CELL_SIZE))
+                pygame.draw.rect(self.window, color, (startX + col*CELL_SIZE, startY + row*CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
         for row in range(ROWS):
             for col in range(COLS):

@@ -2,17 +2,19 @@
 # PIECES CLASS
 # ===============
 import pygame
-from settings import CELL_SIZE
+from settings import BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE, HEIGHT, WIDTH
 
 class Pieces():
-    def __init__(self, color, row, col, window):
+    def __init__(self, color, row, col, window, isKing=False):
         self.color = color
         self.row = row
         self.col = col
         self.window = window
-        self.king = False
+        self.isKing = isKing
 
     def draw_piece(self):
-        center_x = self.col * CELL_SIZE + CELL_SIZE // 2
-        center_y = self.row * CELL_SIZE + CELL_SIZE // 2
+        startX = (WIDTH - BOARD_WIDTH) / 2
+        startY = (HEIGHT - BOARD_HEIGHT) / 2
+        center_x = startX + (self.col * CELL_SIZE + CELL_SIZE // 2)
+        center_y = startY + (self.row * CELL_SIZE + CELL_SIZE // 2)
         pygame.draw.circle(self.window, self.color, (center_x, center_y), 30)

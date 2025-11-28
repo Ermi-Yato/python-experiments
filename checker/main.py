@@ -1,6 +1,5 @@
-from game_functions import gameWinner
 import pygame
-from settings import WIDTH, HEIGHT
+from settings import BOARD_HEIGHT, BOARD_WIDTH, WIDTH, HEIGHT
 from game_board import Board
 
 def run_game():
@@ -8,7 +7,7 @@ def run_game():
     WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Checkers")
 
-    board = Board(WINDOW, WIDTH, HEIGHT)
+    board = Board(WINDOW, BOARD_WIDTH, BOARD_HEIGHT)
 
     run = True
     clock = pygame.time.Clock()
@@ -26,11 +25,7 @@ def run_game():
                 mouseX, mouseY = event.pos
                 board.handle_click(mouseX, mouseY)
 
-        winner = gameWinner(board.piecesArray)
-        if winner:
-            print(f"{winner} wins!")
-            run = False
-
+        WINDOW.fill("gray")
         board.draw_board()
         pygame.display.update()
 
