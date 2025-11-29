@@ -3,7 +3,7 @@ import pygame
 from settings import BOARD_HEIGHT, BOARD_WIDTH, HEIGHT, ROWS, COLS, CELL_SIZE, WIDTH
 from settings import BLACK, WHITE, BLACK_PIECE_COLOR, WHITE_PIECE_COLOR
 from pieces import Pieces
-from game_functions import onClick, move_piece, get_all_capture_moves, get_capture_moves
+from game_functions import isKingPiece, onClick, move_piece, get_all_capture_moves, get_capture_moves
 
 class Board():
     def __init__(self, window, width, height):
@@ -44,12 +44,6 @@ class Board():
                 if piece is not None:
                     piece.draw_piece()
 
-
-    def onClick(self, mouseX,mouseY):
-        row = mouseY // CELL_SIZE
-        col = mouseX // CELL_SIZE
-        return int(row), int(col)
-
     def handle_click(self, mouseX, mouseY):
         row, col = onClick(mouseX, mouseY)
         clicked_piece = self.piecesArray[row][col]
@@ -89,11 +83,13 @@ class Board():
             if clicked_piece is None:
                 isMoved = move_piece(self.selected_piece, row, col, self.piecesArray)
                 if isMoved == "normal":
+                    isKingPiece(self.piecesArray)
                     self.selected_piece = None
                     self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
                     return
 
                 if isMoved == "capture":
+                    isKingPiece(self.piecesArray)
                     nextCapPos = get_capture_moves(self.selected_piece, self.piecesArray)
 
                     if nextCapPos:

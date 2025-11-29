@@ -1,10 +1,10 @@
 from settings import BLACK_PIECE_COLOR, BOARD_HEIGHT, BOARD_WIDTH, CELL_SIZE, COLS, HEIGHT, ROWS, WHITE_PIECE_COLOR, WIDTH
 
-# TODO: YOU HAVE TO UNDERSTAND THIS
 def onClick(mouseX, mouseY):
     startX = (WIDTH - BOARD_WIDTH) / 2
     startY = (HEIGHT - BOARD_HEIGHT) / 2
 
+    # Subtract startX and startY from the mouseX and mouseY
     row = (mouseY - startY) // CELL_SIZE
     col = (mouseX - startX) // CELL_SIZE
     return int(row), int(col)
@@ -116,7 +116,6 @@ def get_capture_moves(piece, piecesArray):
 
     return captures
 
-# WARNING: NEEDS A FIX
 def get_normal_moves(piece, piecesArray):
     prevRow, prevCol = piece.row, piece.col
     moveDirection = [(-1,-1), (-1,1), (1,-1), (1,1)]
@@ -178,4 +177,30 @@ def get_piece_count(piecesArray, turnColor):
             pieces.append(piece)
 
     return len(pieces)
+
+# detect king piece
+def isKingPiece(piecesArray):
+    for row in range(ROWS):
+        for col in range(COLS):
+            piece = piecesArray[row][col]
+
+            if piece is None:
+                continue
+            result = kingDetection(piece)
+            if result:
+                piece.isKing = True
+            else:
+                piece.isKing = piece.isKing
+
+def kingDetection(piece):
+    if piece.color == WHITE_PIECE_COLOR:
+        if piece.row == 0:
+            return True
+    if piece.color == BLACK_PIECE_COLOR:
+        if piece.row == 7:
+            return True
+
+    return False
+
+
 
