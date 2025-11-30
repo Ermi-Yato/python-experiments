@@ -23,21 +23,26 @@ def run_game():
     # try to display a text
     pygame.font.init()
     # font = pygame.font.SysFont("Arial", 50)
-    font = pygame.font.Font("C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", 80)
+    font = pygame.font.Font("C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", 120)
     textColor = "White"
     textSurface = font.render("Checkers", True, textColor)
     textRect = textSurface.get_rect()
-    textX = (WIDTH / 2) - textRect.width/2
+    textX = (WIDTH / 7) - textRect.width/2
 
     board = Board(WINDOW, BOARD_WIDTH, BOARD_HEIGHT)
     borderStartX = (WIDTH - BOARD_WIDTH) // 2
     borderStartY = (HEIGHT - BOARD_HEIGHT) // 2
 
-    startBtn = pygame.image.load("C:/Users/ermiy/Downloads/Button (3).png").convert_alpha()
-    exitBtn = pygame.image.load("C:/Users/ermiy/Downloads/Button (2).png").convert_alpha()
-    button1 = Button(WINDOW, WIDTH - 250,40, startBtn, 0.16)
-    button2 = Button(WINDOW, WIDTH - 250,150, exitBtn, 0.16)
-    arr = [button1,button2]
+    # IMAGES USED 
+    startImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (3).png").convert_alpha()
+    exitImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (2).png").convert_alpha()
+    scoreImg = pygame.image.load("C:/Users/ermiy/Downloads/ScorePanel.png").convert_alpha()
+    scorePanel = pygame.transform.scale(scoreImg, (int(scoreImg.get_width()*0.17), int(scoreImg.get_height()*0.2)))
+    print(startImg.get_width())
+
+    startBtn = Button(WINDOW, 1065,200, startImg, 0.14)
+    exitBtn = Button(WINDOW, 1065,270, exitImg, 0.14)
+    arr = [startBtn, exitBtn]
 
     run = True
     clock = pygame.time.Clock()
@@ -56,13 +61,14 @@ def run_game():
                 board.handle_click(mouseX, mouseY)
 
         WINDOW.fill("#172030")
-        WINDOW.blit(textSurface, (textX,0))
+        WINDOW.blit(textSurface, (textX,150))
+        WINDOW.blit(scorePanel, ((borderStartX+35 - scorePanel.get_width())/2, 280))
 
         for btn in arr:
             btn.draw()
 
         board.draw_board()
-        pygame.draw.rect(WINDOW, "#364153", (borderStartX - 30,borderStartY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=2, border_radius=10)
+        pygame.draw.rect(WINDOW, "#364153", (borderStartX +40,borderStartY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=2, border_radius=10)
         pygame.display.update()
 
 

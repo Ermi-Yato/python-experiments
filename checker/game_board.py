@@ -24,7 +24,7 @@ class Board():
                     if row < 3:
                         self.piecesArray[row].append(Pieces(BLACK_PIECE_COLOR, row, col, self.window, False))
                     elif row > 4:
-                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window, False))
+                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window, True))
                     else:
                         self.piecesArray[row].append(None)
                 else:
@@ -36,7 +36,7 @@ class Board():
         for row in range(ROWS):
             for col in range(COLS):
                 color = WHITE if (row+col)%2 == 0 else BLACK
-                pygame.draw.rect(self.window, color, (startX + col*CELL_SIZE, startY + row*CELL_SIZE, CELL_SIZE, CELL_SIZE))
+                pygame.draw.rect(self.window, color, (startX+70 + col*CELL_SIZE, startY + row*CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
         for row in range(ROWS):
             for col in range(COLS):

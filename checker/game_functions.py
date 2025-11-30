@@ -6,7 +6,7 @@ def onClick(mouseX, mouseY):
 
     # Subtract startX and startY from the mouseX and mouseY
     row = (mouseY - startY) // CELL_SIZE
-    col = (mouseX - startX) // CELL_SIZE
+    col = (mouseX - startX-70) // CELL_SIZE
     return int(row), int(col)
 
 def move_piece(piece, new_row, new_col, piecesArray):
@@ -21,10 +21,10 @@ def move_piece(piece, new_row, new_col, piecesArray):
 
     # NORMAL MOVE
     if abs(rowDiff) == 1 and abs(colDiff) == 1:
-        if piece.color == WHITE_PIECE_COLOR:
+        if piece.color == WHITE_PIECE_COLOR and piece.isKing == False:
             if new_row > prevRow:
                 return None
-        else:
+        if piece.color == BLACK_PIECE_COLOR and piece.isKing == False:
             if prevRow > new_row:
                 return None
 
@@ -35,6 +35,19 @@ def move_piece(piece, new_row, new_col, piecesArray):
         piece.col = new_col
 
         return "normal"
+
+    if piece.isKing and abs(rowDiff) != 0 and abs(colDiff) != 0:
+        piecesArray[prevRow][prevCol] = None
+        piecesArray[new_row][new_col] = piece
+
+        piece.row = new_row
+        piece.col = new_col
+
+        return "normal"
+
+    if piece.isKing:
+        pass
+
 
     # ATTEMPT TO CAPTURE
     if abs(rowDiff) == 2 and abs(colDiff) == 2:

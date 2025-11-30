@@ -1,7 +1,7 @@
 # =========================
 # GAME SETTINGS GOES HERE
 # =========================
-WIDTH, HEIGHT = 1200, 800
+WIDTH, HEIGHT = 1300, 800
 BOARD_WIDTH, BOARD_HEIGHT = 560,560
 ROWS, COLS = 8,8
 CELL_SIZE = BOARD_WIDTH // COLS

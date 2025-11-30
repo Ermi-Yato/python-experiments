@@ -15,7 +15,7 @@ class Pieces():
     def draw_piece(self):
         startX = (WIDTH - BOARD_WIDTH) / 2
         startY = (HEIGHT - BOARD_HEIGHT) / 2
-        center_x = startX + (self.col * CELL_SIZE + CELL_SIZE // 2)
+        center_x = startX+70 + (self.col * CELL_SIZE + CELL_SIZE // 2)
         center_y = startY + (self.row * CELL_SIZE + CELL_SIZE // 2)
         pygame.draw.circle(self.window, self.color, (center_x, center_y), 30)
 
