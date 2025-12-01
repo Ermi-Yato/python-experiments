@@ -36,18 +36,21 @@ def move_piece(piece, new_row, new_col, piecesArray):
 
         return "normal"
 
-    if piece.isKing and abs(rowDiff) != 0 and abs(colDiff) != 0:
-        piecesArray[prevRow][prevCol] = None
-        piecesArray[new_row][new_col] = piece
+    #TODO: Implement long jump for king pieces
 
-        piece.row = new_row
-        piece.col = new_col
-
-        return "normal"
-
-    if piece.isKing:
-        pass
-
+    # if piece.isKing:
+    #     if abs(rowDiff) != 0 and abs(rowDiff) == abs(colDiff):
+    #         piecesArray[prevRow][prevCol] = None
+    #         piecesArray[new_row][new_col] = piece
+    #
+    #         piece.row = new_row
+    #         piece.col = new_col
+    #
+    #         return "normal"
+    #
+    # if piece.isKing:
+    #     pass
+    #
 
     # ATTEMPT TO CAPTURE
     if abs(rowDiff) == 2 and abs(colDiff) == 2:
@@ -56,6 +59,13 @@ def move_piece(piece, new_row, new_col, piecesArray):
         enemy_piece = piecesArray[mid_row][mid_col]
 
         if enemy_piece and enemy_piece.color != piece.color:
+            if piece.color == WHITE_PIECE_COLOR and piece.isKing == False:
+                if new_row > prevRow:
+                    return None
+            if piece.color == BLACK_PIECE_COLOR and piece.isKing == False:
+                if new_row < prevRow:
+                    return None
+
             piecesArray[mid_row][mid_col] = None
             piecesArray[prevRow][prevCol] = None
             piecesArray[new_row][new_col] = piece

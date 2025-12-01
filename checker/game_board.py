@@ -24,7 +24,7 @@ class Board():
                     if row < 3:
                         self.piecesArray[row].append(Pieces(BLACK_PIECE_COLOR, row, col, self.window, False))
                     elif row > 4:
-                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window, True))
+                        self.piecesArray[row].append(Pieces(WHITE_PIECE_COLOR, row, col, self.window, False))
                     else:
                         self.piecesArray[row].append(None)
                 else:

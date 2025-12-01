@@ -1,5 +1,5 @@
 import pygame
-from settings import BOARD_HEIGHT, BOARD_WIDTH, WIDTH, HEIGHT
+from settings import BLACK_PIECE_COLOR, BOARD_HEIGHT, BOARD_WIDTH, WHITE_PIECE_COLOR, WIDTH, HEIGHT
 from game_board import Board
 
 class Button():
@@ -17,28 +17,29 @@ class Button():
 
 def run_game():
     pygame.init()
+    pygame.font.init()
     WINDOW = pygame.display.set_mode((WIDTH, HEIGHT))
     pygame.display.set_caption("Checkers")
 
+    board = Board(WINDOW, BOARD_WIDTH, BOARD_HEIGHT)
+
     # try to display a text
-    pygame.font.init()
-    # font = pygame.font.SysFont("Arial", 50)
-    font = pygame.font.Font("C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", 120)
-    textColor = "White"
-    textSurface = font.render("Checkers", True, textColor)
+    fontTitle = pygame.font.Font("C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", 120)
+    fontTurn = pygame.font.Font("C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", 20)
+    textSurface = fontTitle.render("Checkers", True, "white")
     textRect = textSurface.get_rect()
     textX = (WIDTH / 7) - textRect.width/2
 
-    board = Board(WINDOW, BOARD_WIDTH, BOARD_HEIGHT)
+
     borderStartX = (WIDTH - BOARD_WIDTH) // 2
     borderStartY = (HEIGHT - BOARD_HEIGHT) // 2
+    turnSurface = fontTurn.render("CURRENT TURN", True, "#99A1AF")
 
     # IMAGES USED 
     startImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (3).png").convert_alpha()
     exitImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (2).png").convert_alpha()
     scoreImg = pygame.image.load("C:/Users/ermiy/Downloads/ScorePanel.png").convert_alpha()
     scorePanel = pygame.transform.scale(scoreImg, (int(scoreImg.get_width()*0.17), int(scoreImg.get_height()*0.2)))
-    print(startImg.get_width())
 
     startBtn = Button(WINDOW, 1065,200, startImg, 0.14)
     exitBtn = Button(WINDOW, 1065,270, exitImg, 0.14)
@@ -60,9 +61,18 @@ def run_game():
                 mouseX, mouseY = event.pos
                 board.handle_click(mouseX, mouseY)
 
+        # display turn 
+        if board.turn == WHITE_PIECE_COLOR:
+            text = "WHITE"
+        if board.turn == BLACK_PIECE_COLOR:
+            text = "BLACK"
+        turnSurface1 = fontTurn.render(text, True, "#ffffff")
+
         WINDOW.fill("#172030")
         WINDOW.blit(textSurface, (textX,150))
         WINDOW.blit(scorePanel, ((borderStartX+35 - scorePanel.get_width())/2, 280))
+        WINDOW.blit(turnSurface, (110,300))
+        WINDOW.blit(turnSurface1, (160,350))
 
         for btn in arr:
             btn.draw()
