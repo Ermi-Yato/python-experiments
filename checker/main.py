@@ -1,3 +1,4 @@
+from game_functions import gameWinner
 import pygame
 from settings import BLACK_PIECE_COLOR, BOARD_HEIGHT, BOARD_WIDTH, WHITE_PIECE_COLOR, WIDTH, HEIGHT
 from game_board import Board
@@ -47,10 +48,13 @@ def run_game():
 
     run = True
     clock = pygame.time.Clock()
+
     
     while run:
         clock.tick(60)
-        
+
+        winner = gameWinner(board.piecesArray)
+
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
@@ -59,7 +63,9 @@ def run_game():
                     run = False
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouseX, mouseY = event.pos
-                board.handle_click(mouseX, mouseY)
+                if not winner:
+                    board.handle_click(mouseX, mouseY)
+
 
         # display turn 
         if board.turn == WHITE_PIECE_COLOR:
@@ -72,13 +78,21 @@ def run_game():
         WINDOW.blit(textSurface, (textX,150))
         WINDOW.blit(scorePanel, ((borderStartX+35 - scorePanel.get_width())/2, 280))
         WINDOW.blit(turnSurface, (110,300))
-        WINDOW.blit(turnSurface1, (160,350))
+
+        if not winner:
+            WINDOW.blit(turnSurface1, (160,350))
+        else:
+            turnSurface2 = fontTurn.render(f"{winner} WINS!", True, "#ffffff")
+            WINDOW.blit(turnSurface2, (140, 360))
 
         for btn in arr:
             btn.draw()
 
         board.draw_board()
-        pygame.draw.rect(WINDOW, "#364153", (borderStartX +40,borderStartY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=2, border_radius=10)
+
+        if not winner:
+            pygame.draw.rect(WINDOW, "#364153", (borderStartX +40,borderStartY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=2, border_radius=10)
+
         pygame.display.update()
 
 

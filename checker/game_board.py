@@ -3,7 +3,7 @@ import pygame
 from settings import BOARD_HEIGHT, BOARD_WIDTH, HEIGHT, ROWS, COLS, CELL_SIZE, WIDTH
 from settings import BLACK, WHITE, BLACK_PIECE_COLOR, WHITE_PIECE_COLOR
 from pieces import Pieces
-from game_functions import isKingPiece, onClick, move_piece, get_all_capture_moves, get_capture_moves
+from game_functions import gameWinner, isKingPiece, onClick, move_piece, get_all_capture_moves, get_capture_moves
 
 class Board():
     def __init__(self, window, width, height):
@@ -15,6 +15,7 @@ class Board():
         self.allowed_captures = []
         self.turn = WHITE_PIECE_COLOR
         self.initial_board()
+        self.winner = None
 
     def initial_board(self):
         for row in range(ROWS):
@@ -43,6 +44,19 @@ class Board():
                 piece = self.piecesArray[row][col]
                 if piece is not None:
                     piece.draw_piece()
+
+        # draw something if there's a winner
+        if self.winner == "BLACK":
+            pygame.draw.rect(self.window, "#2F2F2F", (startX + 40, startY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=5, border_radius=8)
+            # color = (255, 255, 255)
+            # surface = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
+            # surface.set_alpha(150) # the opacity
+            # surface.fill(color) # the actual color
+            # self.window.blit(surface, (startX+70, startY))
+            # pygame.draw.rect(self.window, color, (startX+30,startY-20,BOARD_WIDTH, BOARD_HEIGHT), width=10, border_radius=5)
+
+        if self.winner == "WHITE":
+            pygame.draw.rect(self.window, "gray", (startX + 40, startY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=5, border_radius=8)
 
     def handle_click(self, mouseX, mouseY):
         row, col = onClick(mouseX, mouseY)
@@ -86,6 +100,10 @@ class Board():
                     isKingPiece(self.piecesArray)
                     self.selected_piece = None
                     self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
+
+                    self.winner = gameWinner(self.piecesArray)
+                    print(self.winner)
+
                     return
 
                 if isMoved == "capture":
@@ -99,3 +117,6 @@ class Board():
                         self.selected_piece = None
                         self.allowed_captures = []
                         self.turn = BLACK_PIECE_COLOR if self.turn == WHITE_PIECE_COLOR else WHITE_PIECE_COLOR
+                        self.winner = gameWinner(self.piecesArray)
+                        print(self.winner)
+
