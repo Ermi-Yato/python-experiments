@@ -15,6 +15,20 @@ class Button():
     def draw(self):
         self.screen.blit(self.image, (self.rect.x, self.rect.y))
 
+class Text():
+    def __init__(self, window, fontType, caption, x, y, size):
+        self.window = window
+        self.caption = caption
+        self.x = x
+        self.y = y
+        self.size = size
+
+        self.fontType = pygame.font.Font(fontType, self.size)
+        self.textSurface = self.fontType.render(self.caption, True, "white")
+        self.textRect = self.textSurface.get_rect()
+
+    def blit(self):
+        self.window.blit(self.textSurface, (self.x, self.y))
 
 def run_game():
     pygame.init()
@@ -23,20 +37,13 @@ def run_game():
     pygame.display.set_caption("Checkers")
 
     board = Board(WINDOW, BOARD_WIDTH, BOARD_HEIGHT)
-
-    # try to display a text
-    fontTitle = pygame.font.Font("C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", 120)
-    fontTurn = pygame.font.Font("C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", 20)
-    textSurface = fontTitle.render("Checkers", True, "white")
-    textRect = textSurface.get_rect()
-    textX = (WIDTH / 7) - textRect.width/2
-
+    gameTitle = Text(WINDOW, "C:/Users/ermiy/Documents/robus-font/Robus-BWqOd.otf", "Checkers", 25, 150, 120)
+    turnTitle = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", "CURRENT TURN", 110, 310, 20)
 
     borderStartX = (WIDTH - BOARD_WIDTH) // 2
     borderStartY = (HEIGHT - BOARD_HEIGHT) // 2
-    turnSurface = fontTurn.render("CURRENT TURN", True, "#99A1AF")
 
-    # IMAGES USED 
+    # IMAGES USED
     startImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (3).png").convert_alpha()
     exitImg = pygame.image.load("C:/Users/ermiy/Downloads/Button (2).png").convert_alpha()
     scoreImg = pygame.image.load("C:/Users/ermiy/Downloads/ScorePanel.png").convert_alpha()
@@ -49,7 +56,6 @@ def run_game():
     run = True
     clock = pygame.time.Clock()
 
-    
     while run:
         clock.tick(60)
 
@@ -72,18 +78,21 @@ def run_game():
             text = "WHITE"
         if board.turn == BLACK_PIECE_COLOR:
             text = "BLACK"
-        turnSurface1 = fontTurn.render(text, True, "#ffffff")
+        if winner:
+            text = f"{winner} WINS!"
+
+        turn = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", text, 160, 350, 20)
 
         WINDOW.fill("#172030")
-        WINDOW.blit(textSurface, (textX,150))
+        gameTitle.blit()
         WINDOW.blit(scorePanel, ((borderStartX+35 - scorePanel.get_width())/2, 280))
-        WINDOW.blit(turnSurface, (110,300))
+        turnTitle.blit()
 
         if not winner:
-            WINDOW.blit(turnSurface1, (160,350))
+            turn.blit()
         else:
-            turnSurface2 = fontTurn.render(f"{winner} WINS!", True, "#ffffff")
-            WINDOW.blit(turnSurface2, (140, 360))
+            turn = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", text, 130, 360, 20)
+            turn.blit()
 
         for btn in arr:
             btn.draw()
