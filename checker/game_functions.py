@@ -151,7 +151,7 @@ def get_normal_moves(piece, piecesArray):
             continue
         if piecesArray[new_row][new_col] is None:
             return True
-  
+
     return False
 
 def get_legal_moves(piecesArray, color):
@@ -173,9 +173,9 @@ def gameWinner(piecesArray):
     whitePieces = get_piece_count(piecesArray, WHITE_PIECE_COLOR)
     blackPieces = get_piece_count(piecesArray, BLACK_PIECE_COLOR)
 
-    if whitePieces == 0:
+    if whitePieces == 11:
         return "BLACK"
-    if blackPieces == 0:
+    if blackPieces == 11:
         return "WHITE"
 
     if not get_legal_moves(piecesArray, WHITE_PIECE_COLOR):
