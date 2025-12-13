@@ -39,27 +39,36 @@ class Board():
                 color = WHITE if (row+col)%2 == 0 else BLACK
                 pygame.draw.rect(self.window, color, (startX+70 + col*CELL_SIZE, startY + row*CELL_SIZE, CELL_SIZE, CELL_SIZE))
 
+        if self.selected_piece:
+            row, col = self.selected_piece.row, self.selected_piece.col 
+            pygame.draw.rect(self.window, "cyan", (startX+70 + col*CELL_SIZE, startY + row*CELL_SIZE, CELL_SIZE, CELL_SIZE))
+
         for row in range(ROWS):
             for col in range(COLS):
                 piece = self.piecesArray[row][col]
                 if piece is not None:
                     piece.draw_piece()
 
-        # draw something if there's a winner
+        if self.winner:
+            color = "#172030"
+            surface = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
+            surface.set_alpha(150) # the opacity
+            surface.fill(color) # the actual color
+            self.window.blit(surface, (startX+70, startY))
+
         if self.winner == "BLACK":
             pygame.draw.rect(self.window, "#2F2F2F", (startX + 40, startY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=5, border_radius=8)
-            # color = (255, 255, 255)
-            # surface = pygame.Surface((BOARD_WIDTH, BOARD_HEIGHT))
-            # surface.set_alpha(150) # the opacity
-            # surface.fill(color) # the actual color
-            # self.window.blit(surface, (startX+70, startY))
-            # pygame.draw.rect(self.window, color, (startX+30,startY-20,BOARD_WIDTH, BOARD_HEIGHT), width=10, border_radius=5)
-
+            
         if self.winner == "WHITE":
             pygame.draw.rect(self.window, "gray", (startX + 40, startY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=5, border_radius=8)
 
     def handle_click(self, mouseX, mouseY):
         row, col = onClick(mouseX, mouseY)
+        
+        # if row,col outside the checker board, do nothing
+        if not(0 <= row < ROWS and 0 <= col < COLS):
+            return
+
         clicked_piece = self.piecesArray[row][col]
         all_captures = get_all_capture_moves(self.piecesArray, self.turn)
 
@@ -67,7 +76,6 @@ class Board():
             if [row,col] not in self.allowed_captures:
                 print("You must finish capturing first")
                 return
-
         if self.selected_piece is None:
             if len(all_captures) > 0:
                 for obj in all_captures:
@@ -80,7 +88,6 @@ class Board():
             if clicked_piece is not None and clicked_piece.color == self.turn:
                 self.selected_piece = clicked_piece
                 return
-
         else:
             if clicked_piece is not None and clicked_piece.color == self.selected_piece.color:
                 if len(all_captures) > 0:

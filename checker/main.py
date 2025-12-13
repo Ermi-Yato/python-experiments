@@ -52,7 +52,7 @@ def run_game():
 
     startBtn = Button(WINDOW, 1065,200, startImg, 0.14)
     exitBtn = Button(WINDOW, 1065,270, exitImg, 0.14)
-    restartBtn = Button(WINDOW, 0,0, restartImg, 0.14)
+    restartBtn = Button(WINDOW, borderStartX+restartImg.get_width()//5 +10,borderStartY+BOARD_HEIGHT//3, restartImg, 0.2)
     arr = [startBtn, exitBtn, restartBtn]
 
     run = True
@@ -74,6 +74,17 @@ def run_game():
                 if not winner:
                     board.handle_click(mouseX, mouseY)
 
+                for btn in arr:
+                    if btn.rect.collidepoint(mouseX, mouseY):
+                        if btn is startBtn:
+                            # start the game
+                            pass
+                        elif btn is exitBtn:
+                            run = False
+                        elif btn is restartBtn:
+                            # restart the game
+                            pass
+
 
         # display turn 
         if board.turn == WHITE_PIECE_COLOR:
@@ -87,10 +98,8 @@ def run_game():
 
         whitePieces = get_piece_count(board.piecesArray, WHITE_PIECE_COLOR)
         blackPieces = get_piece_count(board.piecesArray, BLACK_PIECE_COLOR)
-
         wcount = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", f"WHITE PIECE --------------------- {whitePieces}", 50, 450, 15, "#99A1AF")
         bcount = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", f"BLACK PIECE --------------------- {blackPieces}", 50, 480, 15, "#99A1AF")
-
 
         WINDOW.fill("#172030")
         gameTitle.blit()
@@ -107,10 +116,12 @@ def run_game():
             turn = Text(WINDOW, "C:/Users/ermiy/Documents/Orbitron/Orbitron-VariableFont_wght.ttf", text, 130, 360, 20, "white")
             turn.blit()
 
-        for btn in arr:
-            btn.draw()
-
         board.draw_board()
+
+        for btn in arr:
+            if not winner and btn == restartBtn:
+                continue
+            btn.draw()
 
         if not winner:
             pygame.draw.rect(WINDOW, "#364153", (borderStartX +40,borderStartY - 30, BOARD_WIDTH + 60, BOARD_HEIGHT + 60), width=2, border_radius=10)

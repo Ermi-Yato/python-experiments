@@ -225,5 +225,10 @@ def kingDetection(piece):
 
     return False
 
+# restart game
+def resetGame():
+    pass
 
+def startGame():
+    pass
 
